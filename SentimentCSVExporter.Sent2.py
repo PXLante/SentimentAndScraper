@@ -18,18 +18,27 @@ reddit = praw.Reddit(client_id='R_ksv9g9qY946Q',
                      client_secret='iqzS7w_QvNdcWfm5mwkL5xcF0WU',
                      user_agent='subSentiment')
 
-headlines = set()
-for submission in reddit.subreddit('TheBluePill').new(limit=None):
-    headlines.add(submission.title)
+headlinesAndComments = set()
+for submission in reddit.subreddit('TheRedPillCircleJerk').new(limit=None):
+    headlinesAndComments.add(submission.title)
     display.clear_output()
-    print(len(headlines))
+    print(len(headlinesAndComments))
+
+    submission.comments.replace_more(limit=0)
+
+    for comment in submission.comments.list():
+        headlinesAndComments.add(comment.body)
+        display.clear_output()
+
+
+
 
 from nltk.sentiment.vader import SentimentIntensityAnalyzer as SIA
 
 sia = SIA()
 results = []
 
-for line in headlines:
+for line in headlinesAndComments:
     pol_score = sia.polarity_scores(line)
     pol_score['headline'] = line
     results.append(pol_score)
